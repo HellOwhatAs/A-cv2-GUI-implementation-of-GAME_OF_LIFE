@@ -41,12 +41,6 @@ def MouseEvent(event, x, y, flags, param):
         ptmp=((y+sight_point[0])*l//(sight)),((x+sight_point[1])*l//(sight))
         world[ptmp]=not world[ptmp]
 
-# @njit
-# def add_grid(img,l,alpha):
-#     for i in range(l):
-#         img[(i*img.shape[0])//l]=alpha
-#         img[:,(i*img.shape[0])//l]=alpha
-#     return img
 @njit
 def update_world(world):
     new_world=np.copy(world)
@@ -71,7 +65,7 @@ def get_cutslice(sight_point,sight,l,cut):
         (round(sight_point[0]-cut[0]*sight/l),round(sight_point[0]-cut[0]*sight/l)+windowl),
         (round(sight_point[1]-cut[1]*sight/l),round(sight_point[1]-cut[1]*sight/l)+windowl)
     ))
-# @njit
+@njit
 def addagrid(tmp,cut,cut2,alpha):
     _1,_2=tmp.shape
     _11,_22=cut2[0]-cut[0],cut2[1]-cut[1]
@@ -126,22 +120,20 @@ if __name__=="__main__":
     while True:
         flag=1
         while True:
-            cut=get_cut(sight_point,sight,l)#max(0,(sight_point[0]*l//sight-10)),max(0,(sight_point[1]*l//sight-10))
-            cut2=get_cut2(sight_point,sight,l)#min(l,((sight_point[0]+windowl)*l//sight+10)),min(l,((sight_point[1]+windowl)*l//sight+10))
+            cut=get_cut(sight_point,sight,l)
+            cut2=get_cut2(sight_point,sight,l)
             tmp=cv2.resize(world[cut[0]:cut2[0],cut[1]:cut2[1]].astype(np.double),(0,0),fx=sight/l,fy=sight/l,interpolation=cv2.INTER_NEAREST)
             tmp=addagrid(tmp,cut,cut2,0.2)
             stmp=get_cutslice(sight_point,sight,l,cut)
             if mode:
-                # if(sight/l>5):cv2.imshow('game of life', add_grid(tmp,l,0.1)[sight_point[0]:sight_point[0]+windowl,sight_point[1]:sight_point[1]+windowl])
-                cv2.imshow('game of life', tmp[stmp[0][0]:stmp[0][1],stmp[1][0]:stmp[1][1]])#[round(sight_point[0]-cut[0]*sight/l):round(sight_point[0]-cut[0]*sight/l)+windowl,round(sight_point[1]-cut[1]*sight/l):round(sight_point[1]-cut[1]*sight/l)+windowl])
+                cv2.imshow('game of life', tmp[stmp[0][0]:stmp[0][1],stmp[1][0]:stmp[1][1]])
                 k=cv2.waitKey(fps)
                 if k==61 and fps>2:
                     fps-=1
                 elif k==45:
                     fps+=1
             else:
-                # if(sight/l>5):cv2.imshow('game of life', add_grid(tmp,l,0.2)[sight_point[0]:sight_point[0]+windowl,sight_point[1]:sight_point[1]+windowl])
-                cv2.imshow('game of life', tmp[stmp[0][0]:stmp[0][1],stmp[1][0]:stmp[1][1]])#[round(sight_point[0]-cut[0]*sight/l):round(sight_point[0]-cut[0]*sight/l)+windowl,round(sight_point[1]-cut[1]*sight/l):round(sight_point[1]-cut[1]*sight/l)+windowl])
+                cv2.imshow('game of life', tmp[stmp[0][0]:stmp[0][1],stmp[1][0]:stmp[1][1]])
                 k=cv2.waitKey(100)
             if k==27 or cv2.getWindowProperty('game of life', cv2.WND_PROP_VISIBLE) < 1.0:
                 flag=0
